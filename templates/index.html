@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GestMoto — Assistant IA</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#101827;color:#eef4ff;font:16px system-ui,sans-serif;min-height:100vh;display:grid;place-items:center}main{width:min(720px,92vw);background:#172235;border:1px solid #2b3a53;border-radius:18px;overflow:hidden;box-shadow:0 20px 70px #0005}header{padding:24px;background:linear-gradient(135deg,#1f6feb,#6547d9)}h1{margin:0 0 6px;font-size:1.5rem}header p{margin:0;opacity:.85}#messages{height:430px;padding:20px;overflow:auto;display:flex;flex-direction:column;gap:12px}.bubble{max-width:78%;padding:12px 15px;border-radius:14px;line-height:1.45;white-space:pre-wrap}.bot{background:#263752;align-self:flex-start}.user{background:#1f6feb;align-self:flex-end}form{display:flex;gap:10px;padding:16px;border-top:1px solid #2b3a53}input{flex:1;padding:13px;border:1px solid #40516d;background:#101827;color:white;border-radius:10px;font-size:1rem}button{border:0;border-radius:10px;padding:0 20px;background:#42c883;color:#092017;font-weight:700;cursor:pointer}
+  </style>
+</head>
+<body><main><header><h1>🏍️ GestMoto</h1><p>Assistant IA pour votre parc de motos</p></header><section id="messages"><div class="bubble bot">Bonjour ! Je peux vous renseigner sur le parc, les motos disponibles et les maintenances.</div></section><form id="chat-form"><input id="message" autocomplete="off" placeholder="Ex. Quelles motos sont disponibles ?"><button>Envoyer</button></form></main>
+<script>
+const form=document.querySelector('#chat-form'),input=document.querySelector('#message'),messages=document.querySelector('#messages'),history=[];
+function add(text,role){const el=document.createElement('div');el.className=`bubble ${role}`;el.textContent=text;messages.appendChild(el);messages.scrollTop=messages.scrollHeight}
+form.addEventListener('submit',async e=>{e.preventDefault();const message=input.value.trim();if(!message)return;add(message,'user');input.value='';input.disabled=true;try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,history})});const d=await r.json();add(d.reply||d.error,'bot');history.push({role:'user',content:message},{role:'assistant',content:d.reply||''})}catch{add('Impossible de joindre le serveur.','bot')}finally{input.disabled=false;input.focus()}});
+</script></body></html>
